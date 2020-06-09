@@ -280,11 +280,13 @@ otu %>%
 otu %>%
   group_by(specimen_id, HMPbodysubsite) %>%
   summarise(
-    read_count = as.vector(
+    read_count = read_count,
+    rare_count = as.vector(
       rrarefy(read_count, sample = 1000)
       )) %>%
   summarise(
-    rare_shannon = diversity(x = read_count,
+    #shannon = ...,
+    rare_shannon = diversity(x = rare_count,
                                  index = "shannon",
                                  base = exp(1))
     ) %>%

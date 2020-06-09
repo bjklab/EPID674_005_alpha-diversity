@@ -289,7 +289,7 @@ class: middle, inverse
 
 ### Alpha diversity
 
-### Rarefaction
+### Rarefaction vs rarefying
 
 ### R&#39;s vegan package
 
@@ -611,11 +611,175 @@ class: center, middle, inverse
 
 .pad-left[
 
+- Typical OTU table orientation in microbiome studies:
+    - 43140 rows
+    - 32 columns
+
+]
+
+.pull-left[
+
+
+```r
+# TYPICAL OTU TABLE ORIENTATION IN MICROBIOME STUDIES
+
+otu %&gt;%
+  reshape2::acast(otu_id ~ specimen_id,
+                  # rows = otu_id, columns = specimen_id
+                  value.var = &quot;read_count&quot;) %&gt;%
+     .[1:10,1:5]
+
+# 43140 ROWS &amp; 32 COLUMNS
+```
+
+
+]
+
+.pull-right[
+
+
+```
+##              700013549 700014386 700014403 700014409 700014412
+## OTU_97.1             0         0         0         0         0
+## OTU_97.10            0         0         6         4         1
+## OTU_97.100           0         0       133         7         1
+## OTU_97.1000          0         0         0         0         0
+## OTU_97.10000         0         0         0         0         0
+## OTU_97.10001         0         0         0         0         0
+## OTU_97.10002         0         0         0         0         0
+## OTU_97.10003         0         0         0         0         0
+## OTU_97.10004         0         0         0         0         0
+## OTU_97.10005         0         0         0         0         0
+```
+
+
+]
+
+
+
+---
+
+# High Dimensional Microbiome Data
+
+.pad-left[
+
+- Typical species table orientation in ecology studies:
+    - 32 rows
+    - 43140 columns
+
+]
+
+.pull-left[
+
+
+```r
+# TYPICAL SPECIES TABLE ORIENTATION IN ECOLOGY STUDIES
+
+otu %&gt;%
+  reshape2::acast(specimen_id ~ otu_id,
+                  # rows = specimen_id, columns = otu_id
+                  value.var = &quot;read_count&quot;) %&gt;%
+   .[1:10,1:5]
+
+# 32 ROWS &amp; 43140 COLUMNS
+```
+
+
+]
+
+.pull-right[
+
+
+```
+##           OTU_97.1 OTU_97.10 OTU_97.100 OTU_97.1000 OTU_97.10000
+## 700013549        0         0          0           0            0
+## 700014386        0         0          0           0            0
+## 700014403        0         6        133           0            0
+## 700014409        0         4          7           0            0
+## 700014412        0         1          1           0            0
+## 700014415        0         5          4           0            0
+## 700014418        0         2          0           0            0
+## 700014421        0         3         25           0            0
+## 700014424        0         1          5           0            0
+## 700014427        0         1          0           0            0
+```
+
+
+]
+
+
+
+---
+
+# High Dimensional Microbiome Data
+
+.pad-left[
+
+- How to deal with high-dimensional microbiome data?
+
+- __Descriptive (e.g., heatmaps and stacked barplots)__
+    
+- Test a priori hypotheses regarding specific OTUs/taxa
+
+- Reduce dimensions:
+
+    - single summary statistic (alpha diversity)
+    
+    - pairwise distances (beta diversity) with PCoA or PERMANOVA
+    
+    - community types (mixture modeling)
+
+
+]
+
+
+
+
+---
+
+# Descriptive Plots
+
+.pad-left[
+
+- Visualization of OTU table:
+
+    - typically present counts as a proportion of sample total
+    
+    - choice of sample order can highlight group differences
+
+- Limitations:
+
+    - cannot depict full list of OTUs
+    
+    - space dictates taxonomic level presented
+
+]
+
+
+
+---
+background-image: url(img/hmp_heatmap.png)
+background-size: contain
+
+
+
+---
+background-image: url(img/hmp_barplot.png)
+background-size: contain
+
+
+
+---
+
+# High Dimensional Microbiome Data
+
+.pad-left[
+
 - How to deal with high-dimensional microbiome data?
 
 - Descriptive (e.g., heatmaps and stacked barplots)
     
-- Test a priori hypotheses regarding specific OTUs/taxa.
+- __Test a priori hypotheses regarding specific OTUs/taxa__
 
 - Reduce dimensions:
 
@@ -631,17 +795,26 @@ class: center, middle, inverse
 
 
 ---
-background-image: url(img/hmp_heatmap.png)
-background-size: contain
 
- &lt;!-- .footnote[Ashelford _Appl Env Micro_ 2005] --&gt; 
+# Single-Taxon Hypotheses
+
+.pad-left[
+
+- You suspect Bacteroides has a relationship with outcome of interest...
+
+    - _Bacteroides_ (genus)?
+    
+    - _Bacteroidaceae_ (family)?
+    
+    - _Bacteroidales_ (order)?
+    
+    - _Bacteroidetes_ (class)?
+
+- Hypotheses focusing on specific taxa often fail to account for possibility of selection bias from culture.
 
 
----
-background-image: url(img/hmp_barplot.png)
-background-size: contain
+]
 
- &lt;!-- .footnote[Ashelford _Appl Env Micro_ 2005] --&gt; 
 
 
 ---
@@ -650,19 +823,22 @@ background-size: contain
 
 .pad-left[
 
-- The problem: high-dimensional microbiome data (p &gt;&gt; n)
+- How to deal with high-dimensional microbiome data?
 
-- __Alpha diversity__ presents one solution:  
+- Descriptive (e.g., heatmaps and stacked barplots)
+    
+- Test a priori hypotheses regarding specific OTUs/taxa
 
-    - summary statistic
+- __Reduce dimensions:__
+
+    - __single summary statistic (alpha diversity)__
     
-    - capture entire community with a single numerical value
+    - pairwise distances (beta diversity) with PCoA or PERMANOVA
     
-    - richness, evenness, diversity
+    - community types (mixture modeling)
 
 
 ]
-
 
 
 
@@ -673,6 +849,87 @@ background-position: 99% 50%
 class: center, middle, inverse
 
 # Alpha Diversity
+
+
+
+---
+
+# Alpha Diversity
+
+.pad-left[
+
+- One solution to the p &gt;&gt; n problem:  
+
+    - capture entire community with a single numerical value
+    
+    - richness: what&#39;s there?
+    
+    - evenness: how are members distributed?
+    
+    - diversity: richness + evenness
+
+
+]
+
+
+
+---
+
+# Alpha Diversity
+
+.pad-left[
+
+- Many alpha diversity metrics (weight richness/evenness):
+
+    - species number, Chao1 (singletons &amp; doubletons)
+    
+    - Shannon diversity: 
+    
+    `$$H&#39; = - \sum{ p_{i} * \log_{b}{(p_{i})} }$$`
+    
+    (note: typically natural log or base 2 are used)
+
+
+]
+
+
+
+---
+
+# Aside on Information Theory
+
+.pad-left[
+
+- Shannon diversity:
+
+    `$$H&#39; = - \sum{ p_{i} * \log_{b}{(p_{i})} }$$`
+    
+- Claude Shannon &amp; information entropy:
+
+    `$$H(p) = - \sum{ p_{i} * \log_{b}{(p_{i})} }$$`
+    
+&quot;The uncertainty contained in a probability distribution is the average log-probability of an event.&quot; (McElreath _Statistical Rethinking, 2nd_ 2020)
+
+]
+
+
+
+---
+
+# Alpha Diversity: Chao1
+
+.pad-left[
+
+- The Chao1 index estimates the total species __richness__:
+
+    `$$S_{Chao1} = S_{obs} + \frac{n_{1}^2}{2*n_{2}}$$`
+    
+(S = number of species; n1 = number singletons; n2 = number doubletons)
+    
+- Chao1 is particularly useful for data sets skewed toward the low-abundance classes, as is likely to be the case with microbes.
+
+
+]
 
 
 
@@ -688,7 +945,146 @@ background-size: 500px
 background-position: 99% 50%
 class: center, middle, inverse
 
-# Rarefaction
+# Rarefaction vs Rarefying
+
+
+
+---
+background-image: url(img/counting_uncountable.png)
+background-size: contain
+
+
+
+---
+
+# Microbes Too Diverse to Count?
+
+.pad-left[
+
+- “In any community, the number of types of organisms observed increases with sampling effort until all types are observed.”
+
+- “The relationship between the number of types observed and sampling effort gives information about the total diversity of the sampled community.”
+
+- “Pattern can be visualized by plotting an accumulation or a rank-abundance curve.”
+
+
+]
+
+
+
+---
+
+# Microbes Too Diverse to Count?
+
+.pad-left[
+
+- “An accumulation curve is a plot of the cumulative number of types observed versus sampling effort.” 
+
+- “Because all communities contain a finite number of species, if the surveyors continued to sample, the curves would eventually reach an asymptote at the actual community richness (number of types).”
+
+- “The curves contain information about how well the communities have been sampled (i.e., what fraction of the species in the community have been detected).”
+
+
+]
+
+
+
+---
+background-image: url(img/accumulation_curves.png)
+background-size: contain
+
+
+
+---
+
+# Microbes Too Diverse to Count?
+
+.pad-left[
+
+- “The more concave-downward the curve, the better sampled the community.”
+
+- “The idea that microbial diversity cannot be estimated comes from the fact that many microbial accumulation curves are linear or close to linear because of high diversity, small sample sizes, or both.”
+
+- “Ultimately, microbes—like tropical insects—are too diverse to count exhaustively.”
+
+
+]
+
+
+
+---
+background-image: url(img/rarefaction.png)
+background-size: contain
+
+
+
+---
+
+# Rarefaction &amp; Rarefying
+
+.pad-left[
+
+- “Rarefaction was originally introduced as a method of estimating species richness (i.e., an alternative to parametric or nonparametric estimators like Chao1)&quot;
+
+- “Rarefaction compares observed richness among sites, treatments, or habitats that have been unequally sampled. A rarefied curve results from averaging randomizations of the observed accumulation curve…. The variance around the repeated randomizations allows one to compare the observed richness among samples.”
+
+
+
+]
+
+
+
+---
+background-image: url(img/inadmissable.png)
+background-size: contain
+
+
+
+
+---
+
+# Rarefaction &amp; Rarefying
+
+.pad-left[
+
+- “Microbiome analysis workflows often begin with an ad hoc library size normalization by random subsampling without replacement, or so-called rarefying…. There is confusion in the literature regarding terminology, and sometimes this normalization approach is conflated with a non-parametric resampling technique — called rarefaction, or individual-based taxon resampling curves — that can be justified for coverage analysis or species richness estimation in some settings.”
+
+
+
+]
+
+
+
+
+---
+
+# Rarefaction &amp; Rarefying
+
+.pad-left[
+
+- “Here we emphasize the distinction between taxon re-sampling curves and normalization by strictly adhering to the terms rarefying or rarefied counts when referring to the normalization procedure, respecting the original definition for rarefaction.”
+
+- &quot;Rarefying defined by the following steps: (1) Select a minimum library size... (2) Discard libraries (microbiome samples) that have fewer reads than [minimum library size]... (3) Subsample the remaining libraries without replacement such that they all have [same] size&quot;
+
+- “Rarefying is now an exceedingly common precursor to microbiome multivariate workflows that seek to relate sample covariates to sample-wise distance matrices.”
+
+
+]
+
+
+
+
+---
+
+# Rarefaction &amp; Rarefying
+
+.pad-left[
+
+- “Despite its current popularity in microbiome analyses __rarefying biological count data is statistically inadmissible__ because it requires the omission of available valid data. This holds even if repeated rarefying trials are compared for stability as previously suggested.”
+
+
+]
+
 
 
 
@@ -703,45 +1099,76 @@ class: center, middle, inverse
 
 
 ---
-background-image: url(img/accumulation_curves.png)
-background-size: contain
+
+# `vegan::diversity()`
+
+.pull-left[
 
 
+```r
+library(vegan)
 
----
-background-image: url(img/counting_uncountable.png)
-background-size: contain
+diversity(x = c(100,0,5,10), index = &quot;shannon&quot;, base = 2)
 
+diversity(x = c(5,5,5,5), index = &quot;shannon&quot;, base = 2)
+```
 
-
----
-background-image: url(img/rarefaction.png)
-background-size: contain
-
-
-
----
-background-image: url(img/inadmissable.png)
-background-size: contain
-
-
-
-
----
-
----
-
-# Alpha Diversity
-
-.pad-left[
-
-- __Reflection:__ What are the advantages of read assignment? What are the advantages of contig assembly?
-
-- __Reflection:__ How are the accuracy of metagenomic assignments evaluated?
-
-- __Reflection:__ What are the advantages and disadvantages of metagenomic sequencing, versus amplicon sequencing, for your own research?
 
 ]
+
+.pull-right[
+
+
+```
+## [1] 0.6784071
+```
+
+```
+## [1] 2
+```
+
+
+]
+
+
+
+
+
+
+---
+
+# `vegan::rrarefy()`
+
+.pull-left[
+
+
+```r
+library(vegan)
+
+rrarefy(x = c(100,0,5,10), sample = 10)
+
+rrarefy(x = c(1421,170,205,3607), sample = 1000)
+```
+
+
+]
+
+.pull-right[
+
+
+```
+##      [,1] [,2] [,3] [,4]
+## [1,]    8    0    0    2
+```
+
+```
+##      [,1] [,2] [,3] [,4]
+## [1,]  248   34   41  677
+```
+
+
+]
+
 
 
 
