@@ -1,0 +1,460 @@
+---
+title: "Alpha Diversity:</br>Summarizing Microbial Communities"
+subtitle: "📚EPID 674📚"  
+author: "Brendan J. Kelly, MD, MS"
+date: 'Updated: `r format(Sys.Date(), "%d %B %Y")`'
+output:
+  xaringan::moon_reader:
+    self_contained: TRUE
+    lib_dir: libs
+    css: xaringan-themer-plus.css
+    nature:
+      ratio: 16:9
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+background-image: url(svg/candyjar.svg)
+background-size: 500px
+background-position: 99% 50%
+class: middle, inverse
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+```
+
+```{r xaringan-themer, include=FALSE, warning=FALSE, eval=FALSE}
+library(xaringanthemer)
+style_duo_accent(
+  primary_color = "#011F5B",
+  secondary_color = "#990000",
+  inverse_header_color = "#FFFFFF",
+  header_font_google = google_font("Roboto Condensed"),
+  text_font_google = google_font("Roboto"),
+  code_font_google = google_font("Roboto Mono"),
+  # padding = "64px 64px 64px 64px"
+  # base_font_size = "24px",
+  # text_font_base = "1rem",
+  # header_h1_font_size = "2.75rem",
+  # header_h2_font_size = "2rem",
+  # header_h3_font_size = "1.25rem",
+)
+```
+
+.pad-left[
+
+### R/tidyverse recap
+
+### Summarizing OTU tables
+
+### Alpha diversity
+
+### Rarefaction
+
+### R's vegan package
+
+]
+
+
+
+---
+background-image: url(svg/candyjar.svg)
+background-size: 500px
+background-position: 99% 50%
+class: center, middle, inverse
+
+# R/tidyverse recap
+
+
+
+---
+
+# R: Making New Variables
+
+.pad-left[
+- `tidyverse` to create new variables
+
+- Make new variables & keep old variables:
+
+    - `mutate()` function
+    
+    - must return same length as input, or length 1 (wll be recycled)
+
+- Make a new variable & lose old variables:
+
+    - `summarise()` function (often follows `group_by()`)
+    
+    - simplest use case: return length of 1
+
+]
+
+
+
+---
+
+# R: Making New Variables
+
+.pull-left[
+
+```{r package-install, echo=TRUE, eval=FALSE, warning=FALSE, message=FALSE}
+# install tidyverse once 
+install.packages('tidyverse')
+
+# load tidyverse functions each time you use
+library(tidyverse)
+
+```
+
+
+]
+
+.pull-right[
+
+- Code at left installs and loads the `tidyverse` package
+
+- The `tidyverse` package includes a set of other packages that permit streamlined data processing
+
+- See Hadley Wickham's _R For Data Science_: [https://r4ds.had.co.nz/](https://r4ds.had.co.nz/)
+
+
+]
+
+
+
+---
+
+# `mutate()`
+
+.pull-left[
+
+```{r read-otu, echo=TRUE, eval=FALSE, warning=FALSE, message=FALSE}
+# make sure tidyverse loaded
+library(tidyverse)
+
+# load (trimmed) HMP V1-V3 OTU table 
+otu <- read_csv(
+  file = 
+    "./data/HMP_OTU_table_longformat.csv.gz",
+)
+
+otu # show what you've read
+
+```
+
+
+]
+
+.pull-right[
+
+```{r read-otu-out, ref.label="read-otu", echo=FALSE, message=FALSE, warning=FALSE}
+
+```
+
+
+]
+
+
+
+
+---
+
+# `mutate()`
+
+.pull-left[
+
+```{r mutate1, echo=TRUE, eval=FALSE, warning=FALSE, message=FALSE}
+
+otu %>%
+  mutate(
+    HMPbodysubsite =
+           gsub("_"," ",HMPbodysubsite)
+    )
+
+
+
+```
+
+
+]
+
+.pull-right[
+
+```{r mutate1-out, ref.label="mutate1", echo=FALSE, message=FALSE, warning=FALSE}
+
+```
+
+
+]
+
+
+
+---
+
+# `mutate()`
+
+.pull-left[
+
+```{r mutate2, echo=TRUE, eval=FALSE, warning=FALSE, message=FALSE}
+
+otu %>%
+  mutate(
+    HMPbodysubsite =
+           gsub("_"," ",HMPbodysubsite),
+    log_reads = log10(read_count)
+    )
+
+
+
+```
+
+
+]
+
+.pull-right[
+
+```{r mutate2-out, ref.label="mutate2", echo=FALSE, message=FALSE, warning=FALSE}
+
+```
+
+
+]
+
+
+
+---
+
+# `summarise()`
+
+.pull-left[
+
+```{r summarise1, echo=TRUE, eval=FALSE, warning=FALSE, message=FALSE}
+
+otu %>%
+  group_by(HMPbodysubsite) %>%
+  summarise(
+    mean_reads = mean(read_count, na.rm = TRUE)) %>%
+  ungroup()
+
+
+```
+
+
+]
+
+.pull-right[
+
+```{r summarise1-out, ref.label="summarise1", echo=FALSE, message=FALSE, warning=FALSE}
+
+```
+
+
+]
+
+
+
+---
+
+# `summarise()`
+
+.pull-left[
+
+```{r summarise2, echo=TRUE, eval=FALSE, warning=FALSE, message=FALSE}
+
+otu %>%
+  group_by(HMPbodysubsite) %>%
+  summarise(
+    mean_reads = mean(read_count, na.rm = TRUE),
+    sum_reads = sum(read_count, na.rm = TRUE)
+    ) %>%
+  ungroup()
+
+
+```
+
+
+]
+
+.pull-right[
+
+```{r summarise2-out, ref.label="summarise2", echo=FALSE, message=FALSE, warning=FALSE}
+
+```
+
+
+]
+
+
+
+---
+background-image: url(svg/candyjar.svg)
+background-size: 500px
+background-position: 99% 50%
+class: center, middle, inverse
+
+# Summarizing OTU tables
+
+
+
+---
+
+# High Dimensional Microbiome Data
+
+.pad-left[
+
+- How to deal with high-dimensional microbiome data?
+
+- Descriptive (e.g., heatmaps and stacked barplots)
+    
+- Test a priori hypotheses regarding specific OTUs/taxa.
+
+- Reduce dimensions:
+
+    - single summary statistic (alpha diversity)
+    
+    - pairwise distances (beta diversity) with PCoA or PERMANOVA
+    
+    - community types (mixture modeling)
+
+
+]
+
+
+
+---
+background-image: url(img/hmp_heatmap.png)
+background-size: contain
+
+ <!-- .footnote[Ashelford _Appl Env Micro_ 2005] --> 
+
+
+---
+background-image: url(img/hmp_barplot.png)
+background-size: contain
+
+ <!-- .footnote[Ashelford _Appl Env Micro_ 2005] --> 
+
+
+---
+
+# High Dimensional Microbiome Data
+
+.pad-left[
+
+- The problem: high-dimensional microbiome data (p >> n)
+
+- __Alpha diversity__ presents one solution:  
+
+    - summary statistic
+    
+    - capture entire community with a single numerical value
+    
+    - richness, evenness, diversity
+
+
+]
+
+
+
+
+---
+background-image: url(svg/candyjar.svg)
+background-size: 500px
+background-position: 99% 50%
+class: center, middle, inverse
+
+# Alpha Diversity
+
+
+
+---
+background-image: url(img/hmp_shannon.png)
+background-size: contain
+
+
+
+---
+background-image: url(svg/candyjar.svg)
+background-size: 500px
+background-position: 99% 50%
+class: center, middle, inverse
+
+# Rarefaction
+
+
+
+---
+background-image: url(svg/candyjar.svg)
+background-size: 500px
+background-position: 99% 50%
+class: center, middle, inverse
+
+# R's vegan package
+
+
+
+---
+background-image: url(img/accumulation_curves.png)
+background-size: contain
+
+
+
+---
+background-image: url(img/counting_uncountable.png)
+background-size: contain
+
+
+
+---
+background-image: url(img/rarefaction.png)
+background-size: contain
+
+
+
+---
+background-image: url(img/inadmissable.png)
+background-size: contain
+
+
+
+
+---
+
+---
+
+# Alpha Diversity
+
+.pad-left[
+
+- __Reflection:__ What are the advantages of read assignment? What are the advantages of contig assembly?
+
+- __Reflection:__ How are the accuracy of metagenomic assignments evaluated?
+
+- __Reflection:__ What are the advantages and disadvantages of metagenomic sequencing, versus amplicon sequencing, for your own research?
+
+]
+
+
+
+---
+class: center, middle, inverse
+background-image: url(svg/conjugation.svg)
+background-size: 500px
+background-position: 50% 50%
+
+# Questions?
+### Post to the discussion board!
+
+
+---
+background-image: url(svg/bacteria.svg)
+background-size: 100px
+background-position: 98% 90%
+class: center, middle
+
+# Thank you!
+#### Slides available: [github.com/bjklab](https://github.com/bjklab/EPID674_002_sequences-to-counts.git)
+#### [brendank@pennmedicine.upenn.edu](brendank@pennmedicine.upenn.edu)
+
+
+
+
