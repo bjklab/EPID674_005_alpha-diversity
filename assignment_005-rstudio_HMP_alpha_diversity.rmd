@@ -123,42 +123,9 @@ otu # show what you've read
 
 
 
-
 ---
 
-# `mutate()`
-
-.pull-left[
-
-```{r mutate1, echo=TRUE, eval=FALSE, warning=FALSE, message=FALSE}
-
-otu %>%
-  mutate(
-    HMPbodysubsite =
-           gsub("_"," ",HMPbodysubsite)
-    )
-
-
-
-```
-
-
-]
-
-.pull-right[
-
-```{r mutate1-out, ref.label="mutate1", echo=FALSE, message=FALSE, warning=FALSE}
-
-```
-
-
-]
-
-
-
----
-
-# `mutate()`
+# Try `mutate()`
 
 .pull-left[
 
@@ -191,38 +158,7 @@ otu %>%
 
 ---
 
-# `summarise()`
-
-.pull-left[
-
-```{r summarise1, echo=TRUE, eval=FALSE, warning=FALSE, message=FALSE}
-
-otu %>%
-  group_by(HMPbodysubsite) %>%
-  summarise(
-    mean_reads = mean(read_count, na.rm = TRUE)) %>%
-  ungroup()
-
-
-```
-
-
-]
-
-.pull-right[
-
-```{r summarise1-out, ref.label="summarise1", echo=FALSE, message=FALSE, warning=FALSE}
-
-```
-
-
-]
-
-
-
----
-
-# `summarise()`
+# Try `summarise()`
 
 .pull-left[
 
@@ -255,17 +191,172 @@ otu %>%
 
 ---
 
+# `summarise()` + `vegan`
+
+.pull-left[
+
+```{r summarise-vegan, echo=TRUE, eval=FALSE, warning=FALSE, message=FALSE}
+
+install.packages("vegan")
+library(vegan)
+
+otu %>%
+  group_by(specimen_id) %>%
+  summarise(
+    specimen_shannon = diversity(x = read_count,
+                                 index = "shannon",
+                                 base = exp(1))
+    ) %>%
+  ungroup()
+
+
+```
+
+
+]
+
+.pull-right[
+
+```{r summarise-vegan-out, ref.label="summarise-vegan", echo=FALSE, message=FALSE, warning=FALSE}
+
+```
+
+
+]
+
+
+
+---
+
+# `summarise()` + `vegan`
+
+.pull-left[
+
+```{r plot-vegan, echo=TRUE, eval=FALSE, warning=FALSE, message=FALSE}
+
+otu %>%
+  group_by(specimen_id, HMPbodysubsite) %>%
+  summarise(
+    specimen_shannon = diversity(x = read_count,
+                                 index = "shannon",
+                                 base = exp(1))
+    ) %>%
+  ungroup() %>%
+  qplot(data = ., x = HMPbodysubsite,
+        y = specimen_shannon,
+        fill = HMPbodysubsite,
+        geom = "boxplot") +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 270,
+                                   hjust = 0,
+                                   vjust = 0.5),
+        legend.position = "none")
+
+
+```
+
+
+]
+
+.pull-right[
+
+```{r plot-vegan-out, ref.label="plot-vegan", echo=FALSE, message=FALSE, warning=FALSE}
+
+```
+
+
+]
+
+
+
+---
+
+# `summarise()` + `vegan`
+
+.pull-left[
+
+```{r summarise-vegan-2, echo=TRUE, eval=FALSE, warning=FALSE, message=FALSE}
+
+otu %>%
+  group_by(specimen_id, HMPbodysubsite) %>%
+  summarise(
+    read_count = as.vector(
+      rrarefy(read_count, sample = 1000)
+      )) %>%
+  summarise(
+    rare_shannon = diversity(x = read_count,
+                                 index = "shannon",
+                                 base = exp(1))
+    ) %>%
+  ungroup()
+
+
+```
+
+
+]
+
+.pull-right[
+
+```{r summarise-vegan-2-out, ref.label="summarise-vegan-2", echo=FALSE, message=FALSE, warning=FALSE}
+
+```
+
+
+]
+
+
+
+---
+
+# `summarise()` + `vegan`
+
+.pull-left[
+
+```{r summarise-vegan-3, echo=TRUE, eval=FALSE, warning=FALSE, message=FALSE}
+
+otu %>%
+  group_by(specimen_id, HMPbodysubsite) %>%
+  summarise(
+    specimen_shannon = diversity(x = read_count,
+                                 index = "shannon",
+                                 base = exp(1))
+    ) %>%
+  ungroup() %>%
+  group_by(HMPbodysubsite) %>%
+  summarise(
+    median_shannon = median(specimen_shannon)
+  ) %>%
+  ungroup()
+
+
+```
+
+
+]
+
+.pull-right[
+
+```{r summarise-vegan-3-out, ref.label="summarise-vegan-3", echo=FALSE, message=FALSE, warning=FALSE}
+
+```
+
+
+]
+
+
+
+---
+
 # Questions
 
 .pad-left[
 
-- How many OTUs (rows) in the HMP V1-V3 OTU table?
+- What is the median Shannon diversity of the Stool specimens?
 
-- How many specimens (rows) in the HMP specimen map?
+- What's the median sequencing depth of the Stool specimens? (use `sum()`)
 
-- Which specimen types are included? (try the "View" function)
-
-- Do you see any other OTU tables on the HMP DACC portal?
+- Compare the Shannon diversity of Stool samples with and without rarefaction to 1000 reads per specimen. How do the diversity estimates differ?
 
 ]
 
