@@ -96,7 +96,7 @@ background-size: contain
 .pull-left[
 
 ```{r read-otu, echo=TRUE, eval=FALSE, warning=FALSE, message=FALSE}
-# make sure tidyverse loaded
+#install.packages("tidyverse")
 library(tidyverse)
 
 # load (trimmed) HMP V1-V3 OTU table 
@@ -197,7 +197,7 @@ otu %>%
 
 ```{r summarise-vegan, echo=TRUE, eval=FALSE, warning=FALSE, message=FALSE}
 
-install.packages("vegan")
+#install.packages("vegan")
 library(vegan)
 
 otu %>%
@@ -260,7 +260,7 @@ otu %>%
 
 .pull-right[
 
-```{r plot-vegan-out, ref.label="plot-vegan", echo=FALSE, message=FALSE, warning=FALSE}
+```{r plot-vegan-out, ref.label="plot-vegan", echo=FALSE, message=FALSE, warning=FALSE, fig.height=5}
 
 ```
 
@@ -381,7 +381,7 @@ background-position: 98% 90%
 class: center, middle
 
 # Thank you!
-#### Slides available: [github.com/bjklab](https://github.com/bjklab/EPID674_002_sequences-to-counts.git)
+#### Slides available: [github.com/bjklab](https://github.com/bjklab/EPID674_005_alpha-diversity.git)
 #### [brendank@pennmedicine.upenn.edu](brendank@pennmedicine.upenn.edu)
 
 
